@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0A0A0A">
+  <title>Hair Colour Try-On — Color Mate</title>
+  <meta name="description" content="Try on any hair colour instantly with AI — Color Mate's virtual hair colour studio.">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/animations.css">
+</head>
+<body>
+
+<!-- ─── Loading Screen ──────────────────────────────────────────────────── -->
+<div id="loader">
+  <div class="brand">Color Mate</div>
+  <div class="loader-spinner"></div>
+  <div class="loading-bar"></div>
+  <p id="loading-msg">Initialising AI…</p>
+</div>
+
+<!-- ─── App ─────────────────────────────────────────────────────────────── -->
+<div id="app" hidden>
+
+  <!-- Header -->
+  <header>
+    <div class="brand-header">Color Mate</div>
+
+    <div class="header-actions">
+      <!-- Mode toggle -->
+      <div class="mode-toggle">
+        <button id="btn-camera-mode" class="active">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+            <circle cx="12" cy="13" r="4"/>
+          </svg>
+          Live
+        </button>
+        <button id="btn-photo-mode">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px">
+            <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
+            <polyline points="21 15 16 10 5 21"/>
+          </svg>
+          Photo
+        </button>
+      </div>
+
+      <!-- Flip camera -->
+      <button class="icon-btn" id="btn-flip" title="Flip camera">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M1 4v6h6"/><path d="M23 20v-6h-6"/>
+          <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4-4.64 4.36A9 9 0 0 1 3.51 15"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Viewport (camera/canvas) -->
+  <div id="viewport">
+    <video id="camera-feed" playsinline autoplay muted></video>
+    <canvas id="render-canvas"></canvas>
+
+    <!-- Compare slider (photo mode) -->
+    <div id="compare-wrapper" hidden>
+      <img id="compare-original-img" alt="Original" draggable="false">
+      <div id="compare-slider">
+        <div class="compare-handle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"/>
+            <polyline points="9 18 15 12 9 6" style="transform:translateX(6px)"/>
+          </svg>
+        </div>
+      </div>
+      <div class="compare-label before">BEFORE</div>
+      <div class="compare-label after">AFTER</div>
+    </div>
+  </div>
+
+  <!-- Action bar -->
+  <div id="action-bar">
+    <button id="btn-upload" title="Upload photo">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+      </svg>
+      Upload
+    </button>
+
+    <button id="btn-capture" title="Capture">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+        <circle cx="12" cy="13" r="4"/>
+      </svg>
+    </button>
+
+    <button id="btn-download" hidden title="Download">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+      Save
+    </button>
+
+    <button id="btn-share" hidden title="Share">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+      </svg>
+      Share
+    </button>
+
+    <button id="btn-open-panel" title="Hair options">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/>
+        <circle cx="8" cy="6" r="2" fill="currentColor" stroke="none"/>
+        <circle cx="16" cy="12" r="2" fill="currentColor" stroke="none"/>
+        <circle cx="10" cy="18" r="2" fill="currentColor" stroke="none"/>
+      </svg>
+      Colours
+    </button>
+  </div>
+
+  <!-- Bottom Sheet -->
+  <div id="bottom-sheet">
+    <div class="sheet-header">
+      <div id="sheet-handle"></div>
+      <button id="btn-close-panel" class="sheet-close-btn" title="Close">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button data-tab="colours" class="active">Colours</button>
+      <button data-tab="effects">Effects</button>
+      <button data-tab="beard">Beard</button>
+      <button data-tab="foryou">For You</button>
+    </div>
+
+    <!-- ── Colours Panel ── -->
+    <div id="panel-colours" class="tab-panel">
+
+      <p class="tab-tagline">Unleash Your True Colours</p>
+
+      <!-- Trending Shades (reordered to top on mobile via CSS order) -->
+      <div class="trending-section" id="trending-section">
+        <div class="trending-section-header">
+          <p class="trending-label">Trending Shades</p>
+          <span class="trending-star">✦</span>
+        </div>
+        <div class="trending-cards" id="swatches-trending"></div>
+      </div>
+
+      <!-- Colour palette (2-row horizontal scroll on mobile) -->
+      <div id="colours-grid-wrap">
+        <p class="swatch-label">Colour Palette</p>
+        <div class="swatches" id="swatches-primary"></div>
+      </div>
+
+      <div class="custom-row">
+        <label>Custom</label>
+        <input type="color" id="custom-color-1" value="#5C3317">
+      </div>
+
+      <div class="slider-row">
+        <label>Intensity</label>
+        <input type="range" id="intensity-slider" min="0" max="100" value="50">
+      </div>
+    </div>
+
+    <!-- ── Effects Panel ── -->
+    <div id="panel-effects" class="tab-panel" hidden>
+      <p class="swatch-label">Style</p>
+      <div class="effect-cards">
+        <button data-effect="solid" class="active">
+          <div class="effect-icon solid"></div>
+          Full
+        </button>
+        <button data-effect="front_streaks">
+          <div class="effect-icon front-streaks"></div>
+          E-Girl
+        </button>
+        <button data-effect="underlayer">
+          <div class="effect-icon underlayer"></div>
+          Underlayer
+        </button>
+        <button data-effect="side_streak">
+          <div class="effect-icon side-streak"></div>
+          Side Streak
+        </button>
+      </div>
+
+      <p class="swatch-label" style="margin-top:4px;">Coming Soon</p>
+      <div class="effect-cards">
+        <div class="effect-card-cs">
+          <div class="effect-icon highlights"></div>
+          Highlights
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Beard Panel ── -->
+    <div id="panel-beard" class="tab-panel" hidden>
+      <div class="coming-soon-panel">
+        <div class="coming-soon-icon">✦</div>
+        <p class="coming-soon-title">Coming Soon</p>
+        <p class="coming-soon-sub">Beard colour try-on is in the works — stay tuned.</p>
+      </div>
+    </div>
+
+    <!-- ── For You Panel ── -->
+    <div id="panel-foryou" class="tab-panel" hidden>
+      <p class="recommend-info">
+        Point your camera at your face, then tap below — our AI will read your skin tone and suggest the most flattering hair colours for you.
+      </p>
+
+      <button class="analyze-btn" id="btn-analyze">Analyse My Skin Tone</button>
+
+      <div id="recommendation-result" hidden>
+        <p id="undertone-label" hidden></p>
+        <div class="swatches" id="swatches-recommend"></div>
+      </div>
+    </div>
+
+  </div><!-- /bottom-sheet -->
+
+  <!-- Mobile vertical intensity slider — right side of viewport, always visible on mobile -->
+  <div id="mobile-intensity-track">
+    <input type="range" id="mobile-intensity-slider" min="0" max="100" value="50" orient="vertical">
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" role="status" aria-live="polite"></div>
+
+</div><!-- /app -->
+
+<!-- Hidden file input -->
+<input type="file" id="file-input" accept="image/*" hidden>
+
+<!-- Main module -->
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

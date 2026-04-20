@@ -1,0 +1,88 @@
+/* animations.css — Transitions, keyframes, loading states */
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position:  400px 0; }
+}
+
+@keyframes pulseGold {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(201, 168, 76, 0.5); }
+  50%       { box-shadow: 0 0 0 8px rgba(201, 168, 76, 0); }
+}
+
+.loader-spinner {
+  width: 48px;
+  height: 48px;
+  border: 3px solid rgba(201,168,76,0.2);
+  border-top-color: #C9A84C;
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+
+.loading-bar {
+  width: 200px;
+  height: 2px;
+  background: rgba(201,168,76,0.15);
+  border-radius: 1px;
+  overflow: hidden;
+  margin-top: 16px;
+}
+
+.loading-bar::after {
+  content: '';
+  display: block;
+  height: 100%;
+  width: 40%;
+  background: linear-gradient(90deg, transparent, #C9A84C, transparent);
+  animation: shimmer 1.4s infinite;
+}
+
+/* Swatch pulse on select */
+.swatch.selected {
+  animation: pulseGold 0.6s ease-out;
+}
+
+/* Panel fade in */
+.tab-panel {
+  animation: fadeIn 0.25s ease;
+}
+
+/* Bottom sheet slide up on first show */
+#bottom-sheet {
+  transition: top 0.35s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+/* Toast slide up */
+#toast {
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+#toast.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Action buttons entrance */
+#action-bar button {
+  animation: slideUp 0.4s ease both;
+}
+
+#action-bar button:nth-child(2) { animation-delay: 0.05s; }
+#action-bar button:nth-child(3) { animation-delay: 0.10s; }
+#action-bar button:nth-child(4) { animation-delay: 0.15s; }

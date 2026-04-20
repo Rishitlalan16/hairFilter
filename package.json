@@ -1,0 +1,17 @@
+{
+  "name": "keshananda-hair-filter",
+  "version": "1.0.0",
+  "description": "",
+  "main": "generate-noise.js",
+  "scripts": {
+    "dev": "npx serve . --listen 3333",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "pngjs": "^7.0.0"
+  }
+}
