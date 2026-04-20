@@ -1,4 +1,4 @@
-#Hair Filter
+# Hair Filter
 
 An AI-powered virtual hair color try-on app that runs entirely in the browser. See how different hair colors look on you in real time using your camera, or upload a photo to try before you dye.
 
